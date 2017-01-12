@@ -26,6 +26,7 @@ public class Lesson13 {
 		FileOutputStream os = new FileOutputStream("C:/Users/Administrator/Desktop/Â¼Ïñ/test_cp.txt");
 		FileChannel ic = is.getChannel();
 		FileChannel oc = os.getChannel();
+		
  
  		ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
  		byteBuffer.clear();
