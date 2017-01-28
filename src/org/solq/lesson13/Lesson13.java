@@ -16,25 +16,66 @@ import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.io.Writer;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.Properties;
 
 public class Lesson13 {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws  Exception {
+		String file = Lesson13.class.getResource("test.properties").getPath();
+		// System.out.println(Lesson13.class.getResource("test.properties").getPath());
+
+		InputStream fs = new FileInputStream(file);
+		Properties pro = new Properties();
+		pro.load(fs);
+		ConfigModel config = ConfigModel.of(pro);
+		// JAVA反射技术 来封装这些构建代码
+		System.out.println(config.getName());
+		
+		
+		// 1要知道类名
+		// 2通过加载类才能知道属性，与方法
+		// 3通过反射的API给该对象设置值
+		String className = ConfigModel.class.getName();
+		
+		//1
+		Class<?> clz = ClassLoader.getSystemClassLoader().loadClass(className);
+		System.out.println(ConfigModel.class.isAssignableFrom(clz));
+
+		//2
+//		Field[] fields = clz.getDeclaredFields();
+//		for(Field f : fields ){
+//			System.out.println(f.getName());
+//		}
+//		
+//		Method[] methods = clz.getDeclaredMethods();
+//		for(Method m : methods ){
+//			System.out.println(m.getName());
+//		}
+		
+		//3
+		Field field =clz.getDeclaredField("name");
+		field.setAccessible(true);
+		field.set(config, "asolq");
+		System.out.println(config.getName());
+	}
+
+	static void test_channel() throws FileNotFoundException, IOException {
 		FileInputStream is = new FileInputStream("C:/Users/Administrator/Desktop/录像/test.txt");
 		FileOutputStream os = new FileOutputStream("C:/Users/Administrator/Desktop/录像/test_cp.txt");
 		FileChannel ic = is.getChannel();
 		FileChannel oc = os.getChannel();
-		
- 
- 		ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
- 		byteBuffer.clear();
- 		while (ic.read(byteBuffer)!= -1) {
-			//写操作时候 byteBuffer 要锁定byte对象的边界对行
- 			byteBuffer.flip();
- 			oc.write(byteBuffer);
- 			byteBuffer.clear();
+
+		ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
+		byteBuffer.clear();
+		while (ic.read(byteBuffer) != -1) {
+			// 写操作时候 byteBuffer 要锁定byte对象的边界对行
+			byteBuffer.flip();
+			oc.write(byteBuffer);
+			byteBuffer.clear();
 		}
 		oc.close();
 		ic.close();
